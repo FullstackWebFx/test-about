@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Barbershop — Масштабний шаблон</title>
+
+  <!-- === CDN: Професійні шрифти (масштабні, заголовки + текст) === -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;600;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- === CDN: TailwindCSS (quick CDN build) === -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- === CDN: Swiper (фон.слайдер) === -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+  <!-- === CDN: AOS (аніміції при скролі) === -->
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
+  <!-- === CDN: GSAP (плавні анімації) === -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- === CDN: FontAwesome (ікони) === -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ========== БАЗОВА ТЕМА ========== */
+    :root {
+      --bg:#070709;
+      --card-bg: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.04);
+      --accent:#eab308; /* професійний теплий акцент */
+      --accent-dark:#b45309;
+      --muted: rgba(235,235,235,0.7);
+      --modal-bg: rgba(8,9,10,0.92);
+      --card-radius: 12px;
+    }
+
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#e6e6e6;
+      font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
+    }
+
+    /* ========== HEADER ========== */
+    header {
+      position: fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:60;
+      background: linear-gradient(180deg, rgba(7,7,9,0.55), rgba(7,7,9,0.3));
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      transition: transform .28s ease, box-shadow .28s ease;
+    }
+    .header-hidden { transform: translateY(-110%); }
+
+    .brand {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.35rem;
+      color: var(--accent);
+      letter-spacing: 0.6px;
+    }
+
+    /* ========== HERO + BACKGROUND SLIDER ========== */
+    .hero-wrap { position:relative; height:100vh; overflow:hidden; }
+    .swiper, .swiper-slide { height:100vh; }
+    .swiper-slide { background-size:cover; background-position:center; filter:brightness(.6) contrast(1.02); }
+
+    .hero-inner {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:2rem;
+      pointer-events:none;
+    }
+    .hero-card {
+      pointer-events:auto;
+      max-width:1100px;
+      width:100%;
+      background: linear-gradient(180deg, rgba(0,0,0,0.28), rgba(0,0,0,0.45));
+      padding: 2.2rem;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 20px 70px rgba(2,6,23,0.7);
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-weight:900;
+      font-size: clamp(28px, 6vw, 56px);
+      color: #fff;
+      line-height:1.02;
+      margin-bottom:.4rem;
+    }
+    .hero-lead { color:var(--muted); font-size:1.05rem; margin-bottom:1.1rem; }
+
+    .cta-row { display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap; }
+
+    /* ========== GRID & CARDS ========== */
+    .wrap { max-width:1200px; margin:0 auto; padding:2rem; }
+    .section-title { font-family:'Playfair Display', serif; font-size:1.6rem; color:#fff; margin-bottom:.4rem; }
+    .section-sub { color:var(--muted); margin-bottom:1rem; }
+
+    .cards-grid {
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:18px;
+      align-items:stretch;
+    }
+    @media (max-width:1024px){ .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width:640px){ .cards-grid { grid-template-columns: 1fr; } }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: var(--card-radius);
+      padding: 1rem;
+      min-height:360px;
+      display:flex;
+      flex-direction:column;
+      border:1px solid rgba(255,255,255,0.03);
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6);
+      transition: transform .25s ease, box-shadow .25s ease;
+      overflow:hidden;
+    }
+    .card:hover { transform: translateY(-8px); box-shadow: 0 24px 60px rgba(2,6,23,0.8); }
+
+    .card-media {
+      height:200px;
+      border-radius:10px;
+      overflow:hidden;
+      background: linear-gradient(135deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:.9rem;
+      position:relative;
+    }
+
+    /* ПУСТА ЗАГЛУШКА img - ви вставите свої файли вручну */
+    .placeholder {
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(255,255,255,0.28);
+      font-size:0.95rem;
+      padding:1rem;
+      text-align:center;
+    }
+    .card-photo { width:100%; height:100%; object-fit:cover; display:block; }
+
+    .card-title { font-family:'Playfair Display', serif; font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:.25rem; }
+    .card-desc { color:var(--muted); flex:1; margin-bottom:.7rem; font-size:.95rem; }
+
+    .card-actions {
+      display:flex;
+      gap:.6rem;
+      align-items:center;
+    }
+    .card-actions button { flex:1; min-width:120px; padding:.7rem .9rem; border-radius:10px; font-weight:600; border:none; cursor:pointer; }
+    .btn-primary { background: linear-gradient(180deg, var(--accent), var(--accent-dark)); color:#0b0c0d; box-shadow: 0 8px 28px rgba(186,134,12,0.18); }
+    .btn-ghost { background: transparent; color:#fff; border:1px solid rgba(255,255,255,0.06); }
+
+    /* ========== MODAL ========== */
+    .modal {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:90;
+      padding:1.6rem;
+      visibility:hidden;
+      opacity:0;
+      transition: opacity .22s ease, visibility .22s ease;
+    }
+    .modal.open { visibility:visible; opacity:1; }
+    .modal-backdrop { position:absolute; inset:0; background:rgba(0,0,0,0.65); backdrop-filter: blur(4px); }
+    .modal-panel {
+      position:relative;
+      max-width:980px;
+      width:100%;
+      max-height:90vh;
+      overflow:auto;
+      background: var(--modal-bg);
+      border-radius:14px;
+      padding:1.4rem;
+      border:1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 40px 120px rgba(2,6,23,0.86);
+    }
+    .modal-close {
+      position:absolute;
+      top:12px;
+      right:12px;
+      background:transparent;
+      border:none;
+      color:#fff;
+      font-size:1.05rem;
+      cursor:pointer;
+    }
+    .modal h3 { font-family:'Playfair Display', serif; margin-bottom:.4rem; }
+    .modal p { color:var(--muted); margin-bottom:.6rem; }
+
+    .form-row { display:grid; grid-template-columns: 1fr 1fr; gap:.6rem; }
+    @media(max-width:640px){ .form-row { grid-template-columns: 1fr; } }
+
+    .form-input {
+      width:100%;
+      padding:.72rem .9rem;
+      border-radius:8px;
+      background: rgba(255,255,255,0.02);
+      border:1px solid rgba(255,255,255,0.04);
+      color:#fff;
+      outline:none;
+    }
+
+    /* ========== FOOTER ========== */
+    footer { padding:2rem; border-top:1px solid rgba(255,255,255,0.03); margin-top:3rem; color:var(--muted); }
+
+    /* Utility */
+    .muted { color:var(--muted); }
+    .pill { background: rgba(255,255,255,0.03); padding:.45rem .6rem; border-radius:999px; font-weight:600; color:#fff; display:inline-block; }
+
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header id="siteHeader" class="py-4">
+    <div class="wrap flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <div class="brand">Barber<span style="color: #fff;"> & </span>Groom</div>
+        <div class="hidden md:flex items-center gap-6 text-sm muted">
+          <a href="#services" class="hover:underline">Послуги</a>
+          <a href="#packages" class="hover:underline">Пакети</a>
+          <a href="#team" class="hover:underline">Майстри</a>
+          <a href="#faq" class="hover:underline">FAQ</a>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="topBookBtn" class="btn-primary px-4 py-2 rounded-md">Записатись</button>
+        <button id="topMoreBtn" class="btn-ghost px-4 py-2 rounded-md"><i class="fa fa-info-circle"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO + BACKGROUND SWIPER -->
+  <main class="hero-wrap">
+    <div class="swiper" id="bgSwiper" aria-hidden="true">
+      <div class="swiper-wrapper">
+        <!-- Фонові фото (використовувати лише для фону, у /img/) -->
+        <div class="swiper-slide" style="background-image: url('/img/bg1.jpg')"></div>
+        <div class="swiper-slide" style="background-image: url('/img/bg2.jpg')"></div>
+        <div class="swiper-slide" style="background-image: url('/img/bg3.jpg')"></div>
+      </div>
+    </div>
+
+    <div class="hero-inner">
+      <div class="hero-card" data-aos="fade-up" data-aos-duration="900">
+        <h1 class="hero-title">Barbershop — Мистецтво чоловічої стрижки</h1>
+        <p class="hero-lead">Стильні стрижки, класичне гоління, догляд за бородою та преміум-сервіс. Ми створюємо образи, які говорять за вас.</p>
+        <div class="cta-row">
+          <button class="btn-primary" id="heroBook">Записатись</button>
+          <button class="btn-ghost" id="heroDetails">Детальніше</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- CONTENT WRAPPER -->
+  <section class="wrap" id="services">
+    <div class="mb-6">
+      <h2 class="section-title">Наші основні послуги</h2>
+      <div class="section-sub">Карточки — рівні за розміром, склястий стиль, кнопки відкривають модальні вікна з великою кількістю інформації та FAQ.</div>
+    </div>
+
+    <!-- CARDS GRID -->
+    <div class="cards-grid" data-aos="fade-up" data-aos-duration="800">
+      <!-- КАРТОЧКА 1 -->
+      <article class="card">
+        <div class="card-media">
+          <!-- img src пустий: ви вставите фото вручну -->
+          <div class="placeholder">Завантажте фото у картку вручну (вставити в img src="...")</div>
+          <img class="card-photo" src="" alt="Фото послуги" aria-hidden="true" />
+        </div>
+        <div class="card-title">Класична чоловіча стрижка</div>
+        <div class="card-desc">Точна стрижка з урахуванням структури волосся. Включає миття, стрижку та легку укладку. Професійні інструменти та індивідуальний підхід.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="classic" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="classic" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </article>
+
+      <!-- КАРТОЧКА 2 -->
+      <article class="card">
+        <div class="card-media">
+          <div class="placeholder">Завантажте фото у картку вручну (вставити в img src="...")</div>
+          <img class="card-photo" src="" alt="Фото послуги" aria-hidden="true" />
+        </div>
+        <div class="card-title">Преміум барбер-пакет</div>
+        <div class="card-desc">Преміум: стрижка, гаряче гоління, масаж голови, аромарушники та догляд після процедури. Ритуал для особливих клієнтів.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="premium" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="premium" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </article>
+
+      <!-- КАРТОЧКА 3 -->
+      <article class="card">
+        <div class="card-media">
+          <div class="placeholder">Завантажте фото у картку вручну (вставити в img src="...")</div>
+          <img class="card-photo" src="" alt="Фото послуги" aria-hidden="true" />
+        </div>
+        <div class="card-title">Класичне гоління</div>
+        <div class="card-desc">Традиційне гоління небезпечною бритвою з попереднім розпарюванням та післязаспокійливим бальзамом.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="shave" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="shave" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </article>
+
+      <!-- КАРТОЧКА 4 -->
+      <article class="card">
+        <div class="card-media">
+          <div class="placeholder">Завантажте фото у картку вручну (вставити в img src="...")</div>
+          <img class="card-photo" src="" alt="Фото послуги" aria-hidden="true" />
+        </div>
+        <div class="card-title">Догляд за бородою</div>
+        <div class="card-desc">Корекція форми, лікувальні маски, масла та індивідуальні рекомендації по догляду вдома.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="beard" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="beard" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </article>
+
+      <!-- КАРТОЧКА 5 -->
+      <article class="card">
+        <div class="card-media">
+          <div class="placeholder">Завантажте фото у картку вручну (вставити в img src="...")</div>
+          <img class="card-photo" src="" alt="Фото послуги" aria-hidden="true" />
+        </div>
+        <div class="card-title">Колорування та корекція</div>
+        <div class="card-desc">Сучасні техніки кольору, дбайливе фарбування та відновлювальний догляд після процедури.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="color" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="color" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </article>
+
+      <!-- КАРТОЧКА 6 -->
+      <article class="card">
+        <div class="card-media">
+          <div class="placeholder">Завантажте фото у картку вручну (вставити в img src="...")</div>
+          <img class="card-photo" src="" alt="Фото послуги" aria-hidden="true" />
+        </div>
+        <div class="card-title">Експрес-послуги</div>
+        <div class="card-desc">Швидкі стрижки, корекція та укладка для клієнтів з обмеженим часом.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="express" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="express" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- PACKAGES (детальна секція з таблицями ПЕРЕВАГ) -->
+  <section class="wrap" id="packages" data-aos="fade-up" data-aos-duration="800">
+    <div class="mb-6">
+      <h2 class="section-title">Пакети послуг — Виберіть свій рівень</h2>
+      <div class="section-sub">Порівняльна таблиця переваг. Фото у таблицях — вставляються ВРУЧНУ (img src="")</div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- PACKAGE 1 -->
+      <div class="card">
+        <div class="card-title">Basic</div>
+        <div class="muted mb-2">Для щоденного догляду</div>
+        <ul class="muted mb-4" style="line-height:1.6;">
+          <li>Класична стрижка</li>
+          <li>Миття та укладка</li>
+          <li>Стандартні засоби для укладки</li>
+        </ul>
+        <div class="flex gap-2">
+          <button class="btn-ghost" data-service="pkg-basic" onclick="openDetails(event)">Детально</button>
+          <button class="btn-primary" data-service="pkg-basic" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </div>
+
+      <!-- PACKAGE 2 -->
+      <div class="card">
+        <div class="card-title">Comfort</div>
+        <div class="muted mb-2">Розширений догляд</div>
+        <ul class="muted mb-4" style="line-height:1.6;">
+          <li>Включає Basic + масаж</li>
+          <li>Індивідуальний підбір засобів</li>
+          <li>Поради по догляду</li>
+        </ul>
+        <div class="flex gap-2">
+          <button class="btn-ghost" data-service="pkg-comfort" onclick="openDetails(event)">Детально</button>
+          <button class="btn-primary" data-service="pkg-comfort" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </div>
+
+      <!-- PACKAGE 3 -->
+      <div class="card">
+        <div class="card-title">Premium</div>
+        <div class="muted mb-2">Повний ритуал</div>
+        <ul class="muted mb-4" style="line-height:1.6;">
+          <li>Все з Comfort</li>
+          <li>Гаряче гоління, аромотерапія, лікувальна маска</li>
+          <li>Ексклюзивний сервіс</li>
+        </ul>
+        <div class="flex gap-2">
+          <button class="btn-ghost" data-service="pkg-premium" onclick="openDetails(event)">Детально</button>
+          <button class="btn-primary" data-service="pkg-premium" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM SECTION -->
+  <section class="wrap" id="team" data-aos="fade-up">
+    <div class="mb-6">
+      <h2 class="section-title">Наші майстри</h2>
+      <div class="section-sub">Команда з досвідом, навчанням та індивідуальним підходом.</div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-media">
+          <div class="placeholder">Фото майстра — вставте вручну</div>
+          <img class="card-photo" src="" alt="" />
+        </div>
+        <div class="card-title">Олексій — Головний барбер</div>
+        <div class="card-desc">12 років досвіду. Спеціалізація: класика, точні лінії, небезпечне гоління.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="alex" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="alex" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-media">
+          <div class="placeholder">Фото майстра — вставте вручну</div>
+          <img class="card-photo" src="" alt="" />
+        </div>
+        <div class="card-title">Іван — Стиліст</div>
+        <div class="card-desc">Сучасні техніки, персональний стайлінг та поради.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="ivan" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="ivan" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-media">
+          <div class="placeholder">Фото майстра — вставте вручну</div>
+          <img class="card-photo" src="" alt="" />
+        </div>
+        <div class="card-title">Дмитро — Барбер</div>
+        <div class="card-desc">Дрібні деталі, ідеальні переходи та акуратні лінії.</div>
+        <div class="card-actions mt-2">
+          <button class="btn-ghost" data-service="dmytro" onclick="openDetails(event)">Детальніше</button>
+          <button class="btn-primary" data-service="dmytro" onclick="openBooking(event)">Записатись</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="wrap" id="faq" data-aos="fade-up">
+    <div class="mb-4">
+      <h2 class="section-title">FAQ — Питання і відповіді</h2>
+      <div class="section-sub">Відповіді на найпопулярніші запитання.</div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="card">
+        <div class="card-title">Як записатися?</div>
+        <div class="card-desc">Натисніть «Записатись» у будь-якій карточці або зверніться за телефоном. У модальному вікні — детальна форма з ім'ям, телефоном, поштою та побажаннями.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Політика відміни</div>
+        <div class="card-desc">Просимо повідомляти про відміну мінімум за 6 годин. У разі запізнення — адміністратор запропонує альтернативний час.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Оплата</div>
+        <div class="card-desc">Готівка або карткою. Сертифікати доступні як подарункові пакети.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Гігієна</div>
+        <div class="card-desc">Всі інструменти дезінфікуються згідно з професійними стандартами після кожного клієнта.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT / FOOTER -->
+  <footer class="wrap">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <div class="brand">Barber & Groom</div>
+        <div class="muted mt-2">Адреса: Ваша вулиця, Місто</div>
+        <div class="muted">Телефон: +38 (099) 123-45-67</div>
+      </div>
+      <div>
+        <div class="section-title">Години роботи</div>
+        <div class="muted">Пн-Пт: 10:00 — 20:00</div>
+        <div class="muted">Сб-Нд: 10:00 — 18:00</div>
+      </div>
+      <div>
+        <div class="section-title">Підписка</div>
+        <div class="muted mb-2">Отримуйте новини та спеціальні пропозиції</div>
+        <div class="flex gap-2">
+          <input class="form-input" placeholder="Email" />
+          <button class="btn-primary">Підписатися</button>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== MODAL: DETAILS (універсальний) ===================== -->
+  <div id="detailsModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" onclick="closeModals()"></div>
+    <div class="modal-panel">
+      <button class="modal-close" onclick="closeModals()"><i class="fa fa-times"></i></button>
+      <div id="detailsContent">
+        <h3 id="detailsTitle"></h3>
+        <p id="detailsSubtitle" class="muted"></p>
+        <div id="detailsLong" style="margin-top:.8rem;color:var(--muted);line-height:1.65;"></div>
+
+        <h4 style="margin-top:1rem;font-family:'Playfair Display', serif;">Глибокий опис процедури</h4>
+        <div id="detailsDeep" style="margin-top:.6rem;color:var(--muted);line-height:1.6;"></div>
+
+        <h4 style="margin-top:1rem;font-family:'Playfair Display', serif;">FAQ по послузі</h4>
+        <div id="detailsFAQ" style="margin-top:.6rem;color:var(--muted);line-height:1.5;"></div>
+
+        <div style="display:flex;gap:.6rem;margin-top:1rem;">
+          <button class="btn-primary" id="detailToBook">Записатись на цю послугу</button>
+          <button class="btn-ghost" onclick="closeModals()">Закрити</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MODAL: BOOKING (універсальний) ===================== -->
+  <div id="bookingModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" onclick="closeModals()"></div>
+    <div class="modal-panel">
+      <button class="modal-close" onclick="closeModals()"><i class="fa fa-times"></i></button>
+
+      <h3>Форма запису — Записатись на співбесіду / візит</h3>
+      <p class="muted">Заповніть детально: ім'я, телефон, електронна пошта, обрана послуга, час, побажання. Ми зв'яжемося для підтвердження.</p>
+
+      <form id="bookingForm" onsubmit="submitBooking(event)" style="margin-top:1rem;">
+        <div class="form-row">
+          <input name="name" class="form-input" placeholder="Ім'я та прізвище" required />
+          <input name="phone" class="form-input" placeholder="Телефон" required />
+        </div>
+
+        <div style="margin-top:.6rem;">
+          <input name="email" type="email" class="form-input" placeholder="Електронна пошта" required />
+        </div>
+
+        <div style="margin-top:.6rem;">
+          <select name="service" class="form-input" required>
+            <option value="">Оберіть послугу</option>
+            <option value="classic">Класична стрижка</option>
+            <option value="premium">Преміум пакет</option>
+            <option value="shave">Гоління</option>
+            <option value="beard">Догляд за бородою</option>
+            <option value="color">Колорування</option>
+            <option value="express">Експрес</option>
+          </select>
+        </div>
+
+        <div style="margin-top:.6rem;">
+          <input name="date" class="form-input" placeholder="Бажана дата та час (напр. 2025-09-15 14:30)" />
+        </div>
+
+        <div style="margin-top:.6rem;">
+          <textarea name="notes" class="form-input" rows="4" placeholder="Додаткова інформація, питання, побажання"></textarea>
+        </div>
+
+        <div style="margin-top:.6rem; display:flex; align-items:center; gap:.6rem;">
+          <input id="consent" name="consent" type="checkbox" required />
+          <label for="consent" class="muted">Погоджуюсь з обробкою персональних даних для підтвердження запису</label>
+        </div>
+
+        <div style="display:flex; gap:.6rem; justify-content:flex-end; margin-top:.8rem;">
+          <button type="submit" class="btn-primary">Надіслати заявку</button>
+          <button type="button" class="btn-ghost" onclick="closeModals()">Скасувати</button>
+        </div>
+
+        <div id="bookingResult" style="margin-top:1rem; display:none;"></div>
+      </form>
+
+    </div>
+  </div>
+
+<script>
+  /* ========== ІНІЦІАЛІЗАЦІЇ CDN-СКРИПТІВ ========== */
+  AOS.init({ duration: 900, once: true });
+
+  const swiper = new Swiper('#bgSwiper', {
+    loop: true,
+    effect: 'fade',
+    autoplay: { delay: 4500, disableOnInteraction: false },
+    speed: 1200
+  });
+
+  // Модель даних для деталей (великий обсяг тексту)
+  const DATA = {
+    classic: {
+      title: "Класична чоловіча стрижка",
+      subtitle: "Техніка, форми, догляд",
+      long: `Детальний опис послуги:\n\nКласична чоловіча стрижка — це поєднання майстерності ножиць і машинки, де важлива точність та врахування індивідуальної структури волосся і форми обличчя. Процедура включає:\n• Консультацію з майстром\n• Миття голови проф.шампунем\n• Стрижка по техніці, підбір довжин\n• Корекція контурів\n• Легка укладка та рекомендації по домашньому догляду\n\nПереваги: приємний сервіс, індивідуальний підхід, економія часу. Рекомендовано повторювати кожні 4–6 тижнів.`,
+      deep: `Технічні деталі та матеріали:\n- Використовуємо ножиці преміум-класу та машинки з регульованими насадками.\n- Перед процедурою проводиться оцінка стану волосся (сухість, ламкість).\n- Майстер надає поради по засобам: пінки, пасти, помади, кондиціонери.`,
+      faq: [
+        {q:"Скільки триває?", a:"40–60 хвилин в залежності від складності."},
+        {q:"Чи потрібна попередня підготовка?", a:"Ні, можна прийти з сухим або чистим волоссям — майстер підкаже."}
+      ]
+    },
+
+    premium: {
+      title:"Преміум барбер-пакет",
+      subtitle:"Ритуал для максимального комфорту",
+      long:`Пакет «Преміум» — це повна програма: від релаксації до естетичного результату.\nВключає:\n• Подовжена консультація і аналіз шкіри/волосся\n• Стрижка високого рівня майстерності\n• Гаряче гоління / корекція бороди\n• Масаж голови з лікувальними маслами\n• Теплові компреси і післяпроцедурний догляд\n\nПереваги: максимальний комфорт, відновлення волосся та шкіри, персональна програма догляду.`,
+      deep:`Рекомендації по догляду:\n- Після пакету рекомендується застосовувати відновлювальні маски 1-2 рази на тиждень.\n- Майстер надасть індивідуальні засоби для домашнього застосування.`,
+      faq:[
+        {q:"Чи підходить для першого візиту?", a:"Так, але радимо обговорити очікування з майстром."},
+      ]
+    },
+
+    shave: {
+      title:"Класичне гоління",
+      subtitle:"Точність та традиції",
+      long:`Класичне гоління виконується з використанням спеціальних засобів і технік:\n• Пілінг/скраб\n• Розпарювання рушником\n• Нанесення преміальної піни\n• Гоління гострою бритвою за контуром\n• Бальзам після гоління\n\nРезультат: чисті лінії, доглянута шкіра.`,
+      deep:`Безпека:\n- Проводиться розпарювання та антисептика.\n- Майстер підбирає техніку під чутливість шкіри.`,
+      faq:[
+        {q:"Чи бувають подразнення?", a:"У деяких клієнтів можливе короткочасне почервоніння; ми застосовуємо заспокійливі засоби."}
+      ]
+    },
+
+    beard: {
+      title:"Догляд за бородою",
+      subtitle:"Форма, живлення, стиль",
+      long:`Комплекс процедур для бороди: корекція форми, тримінг, нанесення живильних масок та масел. Ми враховуємо густоту, напрям росту волосся і бажаний образ.`,
+      deep:`Рекомендації:\n- Масло для бороди використовувати щодня.\n- Для моделювання — помада або віск.`,
+      faq:[
+        {q:"Як часто коригувати?", a:"Кожні 2–4 тижні залежно від бажаного вигляду."}
+      ]
+    },
+
+    color: {
+      title:"Колорування та корекція",
+      subtitle:"Натуральні відтінки та сучасні техніки",
+      long:`Підбір безпечних барвників і сучасних технік кольору. Тест на алергію за потреби. Післяфарбовий догляд — обов'язковий для збереження кольору.`,
+      deep:`Час процедури: від 60 до 180 хв. Залежить від обсягу та техніки.`,
+      faq:[
+        {q:"Чи шкодить волосся?", a:"Ми використовуємо мінімально агресивні формули та живильні маски."}
+      ]
+    },
+
+    express: {
+      title:"Експрес-послуги",
+      subtitle:"Якісно і швидко",
+      long:`Експрес-послуги — це коротка корекція, миття та укладка. Ідеально для зайнятих клієнтів. Тривалість зазвичай до 30 хв.`,
+      deep:`Переваги: швидко, професійно, без втрати якості.`,
+      faq:[
+        {q:"Чи потрібен запис?", a:"Для гарантії — так, але можливі вільні слоти walk-in."}
+      ]
+    },
+
+    // пакети і майстри теж
+    'pkg-basic': { title:"Пакет Basic", subtitle:"Базовий пакет", long:"Basic: стандартна стрижка, миття, укладка.", deep:"Оптимальний для тих, хто приходить регулярно.", faq:[] },
+    'pkg-comfort': { title:"Пакет Comfort", subtitle:"Розширений пакет", long:"Comfort: Basic + масаж та рекомендації.", deep:"Баланс ціни і сервісу.", faq:[] },
+    'pkg-premium': { title:"Пакет Premium", subtitle:"Преміум пакет", long:"Premium: повний ритуал з гарячим голінням та масажем.", deep:"Подарунковий формат доступний.", faq:[] },
+
+    alex: { title:"Олексій — Головний барбер", subtitle:"12 років досвіду", long:"Олексій — експерт у класичних техніках та рітейлах.", deep:"Участь у конкурсах, тренер.", faq:[] },
+    ivan: { title:"Іван — Стиліст", subtitle:"Сучасні техніки", long:"Іван — фахівець по сучасних техніках.", deep:"Робить акцент на персональний стиль.", faq:[] },
+    dmytro: { title:"Дмитро — Барбер", subtitle:"Деталі та акуратність", long:"Дмитро — майстер деталей.", deep:"Працює з бородою та переходами.", faq:[] }
+  };
+
+  /* Відкриття модалки з деталями */
+  function openDetails(e){
+    const el = e.currentTarget || e.target;
+    const id = el.dataset.service;
+    const data = DATA[id] || { title: "Інформація", subtitle:"", long:"", deep:"", faq:[] };
+    document.getElementById('detailsTitle').textContent = data.title;
+    document.getElementById('detailsSubtitle').textContent = data.subtitle || '';
+    document.getElementById('detailsLong').innerHTML = "<pre style='white-space:pre-wrap;color:var(--muted);'>"+(data.long||"")+"</pre>";
+    document.getElementById('detailsDeep').innerHTML = "<pre style='white-space:pre-wrap;color:var(--muted);'>"+(data.deep||"")+"</pre>";
+
+    // FAQ
+    const faqEl = document.getElementById('detailsFAQ');
+    faqEl.innerHTML = "";
+    if(data.faq && data.faq.length){
+      data.faq.forEach(item=>{
+        const div = document.createElement('div');
+        div.style.marginBottom = '.6rem';
+        div.innerHTML = '<strong style="color:#fff;">'+item.q+'</strong><div style="color:var(--muted)">'+item.a+'</div>';
+        faqEl.appendChild(div);
+      });
+    } else {
+      faqEl.innerHTML = '<div style="color:var(--muted)">Додаткові питання можна уточнити при записі.</div>';
+    }
+
+    // Приклад: кнопка в модалці переводить до форми запису з автопідстановкою послуги
+    document.getElementById('detailToBook').onclick = function(){
+      closeModals();
+      openBookingWithService(id);
+    };
+
+    document.getElementById('detailsModal').classList.add('open');
+    document.getElementById('detailsModal').setAttribute('aria-hidden','false');
+  }
+
+  /* Відкриття модалки запису */
+  function openBooking(e){
+    // якщо виклик з onclick з data-service
+    const id = (e && (e.currentTarget || e.target) && (e.currentTarget.dataset?.service || e.target.dataset?.service)) || null;
+    openBookingWithService(id);
+  }
+
+  function openBookingWithService(serviceId){
+    document.getElementById('bookingModal').classList.add('open');
+    document.getElementById('bookingModal').setAttribute('aria-hidden','false');
+    if(serviceId){
+      const sel = document.querySelector('#bookingForm select[name="service"]');
+      if(sel) sel.value = serviceId;
+    }
+    // зняти попередні результати
+    document.getElementById('bookingResult').style.display = 'none';
+  }
+
+  function closeModals(){
+    document.querySelectorAll('.modal.open').forEach(m => {
+      m.classList.remove('open');
+      m.setAttribute('aria-hidden','true');
+    });
+  }
+
+  // Підключення кнопок в header/hero
+  document.getElementById('heroBook').addEventListener('click', ()=> openBookingWithService(null));
+  document.getElementById('heroDetails').addEventListener('click', ()=> { 
+    // показати деталі преміуму як приклад
+    const fakeEvent = { currentTarget: { dataset: { service: 'premium' } } };
+    openDetails(fakeEvent);
+  });
+  document.getElementById('topBookBtn').addEventListener('click', ()=> openBookingWithService(null));
+  document.getElementById('topMoreBtn').addEventListener('click', ()=> {
+    const fakeEvent = { currentTarget: { dataset: { service: 'classic' } } };
+    openDetails(fakeEvent);
+  });
+
+  // Плавне ховання header при скролі
+  let lastScroll = 0;
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () => {
+    const st = window.scrollY || window.pageYOffset;
+    if (st > lastScroll && st > 100) header.classList.add('header-hidden');
+    else header.classList.remove('header-hidden');
+    lastScroll = st <= 0 ? 0 : st;
+  });
+
+  // GSAP appearance
+  gsap.from(".card", {opacity:0, y:20, stagger:0.06, duration:0.9, ease:"power3.out"});
+
+  // Обробка форми запису (клієнт-сайт)
+  function submitBooking(e){
+    e.preventDefault();
+    const f = e.target;
+    const data = new FormData(f);
+    const obj = {};
+    data.forEach((v,k) => obj[k]=v);
+
+    const resultEl = document.getElementById('bookingResult');
+    resultEl.style.display = 'block';
+    resultEl.style.padding = '1rem';
+    resultEl.style.borderRadius = '8px';
+    resultEl.style.background = 'rgba(255,255,255,0.02)';
+    resultEl.innerHTML = '<strong style="color:#fff;">Дякуємо, '+(obj.name||'')+'!</strong><div style="color:var(--muted);margin-top:.4rem">Ваша заявка отримана. Ми перевіримо доступність і зв\'яжемося з вами для підтвердження протягом 2 годин.<pre style="color:var(--muted);margin-top:.6rem">'+JSON.stringify(obj,null,2)+'</pre></div>';
+
+    // Очистити форму
+    f.reset();
+    // Закрити модалку через 1.6с
+    setTimeout(()=> closeModals(), 1600);
+  }
+
+  // Закриття на ESC
+  window.addEventListener('keydown', (ev)=>{
+    if(ev.key === 'Escape') closeModals();
+  });
+
+  // Захист: переконаємось, що /img/bg*.jpg НЕ використовується в карточках
+  (function enforceBackgroundOnly(){
+    const bgAllowed = ['/img/bg1.jpg','/img/bg2.jpg','/img/bg3.jpg'];
+    // Якщо десь випадково використано фон.фото у img, видаляємо src
+    document.querySelectorAll('img').forEach(img=>{
+      const s = img.getAttribute('src') || '';
+      if(bgAllowed.includes(s)) img.setAttribute('src','');
+    });
+  })();
+
+  // Примітка: карти-образи залишаються пустими — вставте свої шляхи у відповідні <img src="..."> вручну.
+</script>
+</body>
+</html>
